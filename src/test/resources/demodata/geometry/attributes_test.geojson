@@ -1,0 +1,84 @@
+{
+  "type" : "FeatureCollection",
+  "features" : [
+    {
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [
+              -93.0,
+              2.0
+            ],
+            [
+              -92.0,
+              2.0
+            ],
+            [
+              -92.0,
+              3.0
+            ],
+            [
+              -93.0,
+              3.0
+            ],
+            [
+              -93.0,
+              2.0
+            ]
+          ]
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "BUSINESSUNI" : "Farm Group",
+        "FIELD" : "Field 1",
+        "GROWER" : "ABC Farms",
+        "FARM" : "Farm 1",
+        "LOCATION" : "Smallsville",
+        "FIELD_GUID" : "3d698dc2-5eab-4aeb-afde-bb7a674f6708",
+        "VAR" : "Crop Production Services"
+      },
+      "id" : "test_id"
+    },
+    {
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [
+              -92.0,
+              1.0
+            ],
+            [
+              -91.0,
+              1.0
+            ],
+            [
+              -91.0,
+              2.0
+            ],
+            [
+              -92.0,
+              2.0
+            ],
+            [
+              -92.0,
+              1.0
+            ]
+          ]
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "BUSINESSUNI" : "Farm Group",
+        "FIELD" : "Field 2",
+        "GROWER" : "ABC Farms",
+        "FARM" : "Farm 2",
+        "LOCATION" : "Smallsville",
+        "FIELD_GUID" : "4d698dc2-5eab-4aeb-afde-bb7a674f6708",
+        "VAR" : "Crop Production Services"
+      }
+    }
+  ]
+}

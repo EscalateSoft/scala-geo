@@ -1,0 +1,302 @@
+{
+  "type" : "FeatureCollection",
+  "features" : [
+    {
+      "geometry" : {
+        "type" : "Point",
+        "coordinates" : [
+          10.0,
+          20.0
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 0,
+        "square" : 0.0,
+        "stars" : ""
+      },
+      "id": "point-0"
+    },
+    {
+      "geometry" : {
+        "type" : "MultiPoint",
+        "coordinates" : [
+          [
+            10.0,
+            20.0
+          ],
+          [
+            20.0,
+            30.0
+          ],
+          [
+            30.0,
+            40.0
+          ],
+          [
+            20.0,
+            50.0
+          ]
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 1,
+        "square" : 1.0,
+        "stars" : "*"
+      },
+      "id": "multi-point-0"
+    },
+    {
+      "geometry" : {
+        "type" : "Point",
+        "coordinates" : [
+          20.0,
+          30.0
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 2,
+        "square" : 4.0,
+        "stars" : "**"
+      }
+    },
+    {
+      "geometry" : {
+        "type" : "LineString",
+        "coordinates" : [
+          [
+            10.0,
+            20.0
+          ],
+          [
+            20.0,
+            30.0
+          ]
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 3,
+        "square" : 9.0,
+        "stars" : "***"
+      }
+    },
+    {
+      "geometry" : {
+        "type" : "Point",
+        "coordinates" : [
+          30.0,
+          40.0
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 4,
+        "square" : 16.0,
+        "stars" : "****"
+      }
+    },
+    {
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [
+              10.0,
+              20.0
+            ],
+            [
+              20.0,
+              30.0
+            ],
+            [
+              30.0,
+              40.0
+            ],
+            [
+              20.0,
+              50.0
+            ],
+            [
+              10.0,
+              20.0
+            ]
+          ]
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 5,
+        "square" : 25.0,
+        "stars" : "*****"
+      }
+    },
+    {
+      "geometry" : {
+        "type" : "Point",
+        "coordinates" : [
+          20.0,
+          50.0
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 6,
+        "square" : 36.0,
+        "stars" : "******"
+      }
+    },
+    {
+      "geometry" : {
+        "type" : "MultiLineString",
+        "coordinates" : [
+          [
+            [
+              10.0,
+              20.0
+            ],
+            [
+              20.0,
+              30.0
+            ]
+          ],
+          [
+            [
+              30.0,
+              40.0
+            ],
+            [
+              20.0,
+              50.0
+            ]
+          ]
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 7,
+        "square" : 49.0,
+        "stars" : "*******"
+      }
+    },
+    {
+      "geometry" : {
+        "type" : "LineString",
+        "coordinates" : [
+          [
+            30.0,
+            40.0
+          ],
+          [
+            20.0,
+            50.0
+          ]
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 8,
+        "square" : 64.0,
+        "stars" : "********"
+      }
+    },
+    {
+      "geometry" : {
+        "type" : "MultiPolygon",
+        "coordinates" : [
+          [
+            [
+              [
+                10.0,
+                20.0
+              ],
+              [
+                20.0,
+                30.0
+              ],
+              [
+                30.0,
+                40.0
+              ],
+              [
+                20.0,
+                50.0
+              ],
+              [
+                10.0,
+                20.0
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                100.0,
+                100.0
+              ],
+              [
+                110.0,
+                100.0
+              ],
+              [
+                110.0,
+                110.0
+              ],
+              [
+                100.0,
+                110.0
+              ],
+              [
+                100.0,
+                100.0
+              ]
+            ]
+          ]
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 9,
+        "square" : 81.0,
+        "stars" : "*********"
+      }
+    },
+    {
+      "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+          [
+            [
+              100.0,
+              100.0
+            ],
+            [
+              110.0,
+              100.0
+            ],
+            [
+              110.0,
+              110.0
+            ],
+            [
+              100.0,
+              110.0
+            ],
+            [
+              100.0,
+              100.0
+            ]
+          ]
+        ]
+      },
+      "type" : "Feature",
+      "properties" : {
+        "i" : 10,
+        "square" : 100.0,
+        "stars" : "**********"
+      }
+    }
+  ]
+}
