@@ -23,7 +23,7 @@ abstract class CRST[T]:
   final lazy val crsDef: CRSDef = apply()
   final lazy val crs: CoordinateReferenceSystem = crsDef.crs
   final lazy val crsId: String = crsDef.crsId
-  implicit val implicitCrsDef: CRST[CRS_TYPE] = this
+  given CRST[CRS_TYPE] = this
 
   private val X_AXIS = 0
 
@@ -40,18 +40,18 @@ abstract class CRST[T]:
       case _   => (1e-9, 1e-9)
 
 abstract class CRSAngle[T] extends CRST[T]:
-  override implicit val implicitCrsDef: CRSAngle[CRS_TYPE] = this
+  given CRSAngle[CRS_TYPE] = this
 
 abstract class CRSDegree[T] extends CRSAngle[T]:
-  override implicit val implicitCrsDef: CRSDegree[CRS_TYPE] = this
+  given CRSDegree[CRS_TYPE] = this
   override lazy val pointTolerance: Double = 1e-9
   override lazy val areaTolerance: Double = 1e-9
 
 abstract class CRSLength[T] extends CRST[T]:
-  override implicit val implicitCrsDef: CRSLength[CRS_TYPE] = this
+  given CRSLength[CRS_TYPE] = this
 
 abstract class CRSMeter[T] extends CRSLength[T]:
-  override implicit val implicitCrsDef: CRSMeter[CRS_TYPE] = this
+  given CRSMeter[CRS_TYPE] = this
   override lazy val pointTolerance: Double = 1e-4
   override lazy val areaTolerance: Double = 1e-1
 

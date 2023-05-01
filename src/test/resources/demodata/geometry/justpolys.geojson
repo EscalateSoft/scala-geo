@@ -35,7 +35,7 @@
         "square" : 0.0,
         "stars" : ""
       },
-      "id" : "test_id"
+      "id" : "test_id0"
     },
     {
       "geometry" : {
@@ -70,7 +70,8 @@
         "i" : 1,
         "square" : 1.0,
         "stars" : "*"
-      }
+      },
+      "id" : "test_id1"
     },
     {
       "geometry" : {
@@ -131,7 +132,8 @@
         "i" : 2,
         "square" : 4.0,
         "stars" : "**"
-      }
+      },
+      "id" : "test_id2"
     }
   ]
 }

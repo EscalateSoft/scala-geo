@@ -20,14 +20,14 @@ object FeatureJsonCodec:
       import GeoJsonRawFormats.given
       val attr = featureRaw.properties.get.as[ATTR]
       val geom = featureRaw.geometry.map(_.toGeometry).getOrElse(throw new IllegalStateException(s"No geometry specified in feature $featureRaw"))
-      FeatureInCRS[EPSG_4326, Geometry, ATTR](geom, attr)
+      FeatureInCRS[EPSG_4326, Geometry, ATTR](geom, attr, setId = featureRaw.id)
     }
 
   def featureToGeoRaw[ATTR: Writes](feature: FeatureInCRS[EPSG_4326, Geometry, ATTR]): FeatureJson =
     import GeoJsonRawFormats.given
     val attrJson = Json.toJson(feature.attr).as[JsObject]
     val geomJson = GeometryJson.fromGeometry(feature.geometry)
-    FeatureJson(if feature.id.isEmpty then None else Some(feature.id), Some(geomJson), Some(attrJson))
+    FeatureJson(feature.setId, Some(geomJson), Some(attrJson))
 
   given featureFromJSON[ATTR: Reads]: Reads[FeatureInCRS[EPSG_4326, Geometry, ATTR]] = { js =>
     import GeoJsonRawFormats.given

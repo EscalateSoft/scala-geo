@@ -8,7 +8,10 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import play.api.libs.json.JsError
 import play.api.libs.json.JsSuccess
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 import java.io.File
 import java.nio.charset.StandardCharsets
@@ -18,11 +21,15 @@ import language.higherKinds
 import GeoJsonRawFormats.given
 
 class FeatureJsonCodecSpec extends AnyFunSpec with Matchers with TypeCheckedTripleEquals:
+
+  def readFileToString(filePath: String): String =
+    val file = new File(getClass.getClassLoader.getResource(filePath).toURI)
+    FileUtils.readFileToString(file, StandardCharsets.UTF_8)
+
   describe("Feature GeoJSON encoding and decoding") {
 
     it("should read a feature collection from geojson to a raw representation") {
-      val justPolys = new File(getClass.getClassLoader.getResource("demodata/geometry/justpolys.geojson").toURI)
-      val featureCollectionJsonStr = FileUtils.readFileToString(justPolys, StandardCharsets.UTF_8)
+      val featureCollectionJsonStr = readFileToString("demodata/geometry/justpolys.geojson")
       val featureCollectionJson = Json.parse(featureCollectionJsonStr)
 
       val fc = featureCollectionJson.as[FeatureCollectionJson]
@@ -60,49 +67,29 @@ class FeatureJsonCodecSpec extends AnyFunSpec with Matchers with TypeCheckedTrip
       Json.toJson(fc) should ===(featureCollection)
     }
 
-    /*it("should read a feature collection from a non-circe generated JSON file") {
-      val featureCollectionJsonStr =
-        FileReader.getLines("demodata/collections/BiddickAndPodyDiana.geojson").mkString
-      val featureCollectionJson = parse(featureCollectionJsonStr)
-      val collection =
-        FeatureJsonCodec.featureCollectionFromGeoJSON[Json](featureCollectionJson.right.get)
-
-      collection.get.features should have size (2)
-
-      collection.get.features.head.setId should be(defined)
-
-      // converting it back should yield the same result
-      val compareStr = FeatureJsonCodec.featureCollectionToGeoJSON(collection.get).noSpaces
-      compareStr should not be (featureCollectionJsonStr)
-
-      val circeJsonStr =
-        FileReader.getLines("demodata/collections/BiddickAndPodyDiana-circe.geojson").mkString
-      compareStr should be(circeJsonStr)
-    }
 
     it("should narrow deserialized feature collections to requested geometry types") {
-      val featureCollectionJsonStr =
-        FileReader.getLines("demodata/collections/BiddickAndPodyDiana-circe.geojson").mkString
-      val featureCollectionJson = parse(featureCollectionJsonStr)
-      val collection: Try[FeatureCollectionInCRS[EPSG_4326, Geometry, Json]] =
-        FeatureJsonCodec.featureCollectionFromGeoJSON[Json](featureCollectionJson.right.get)
+      val featureCollectionJsonStr = readFileToString("demodata/geometry/allgeoms.geojson")
+      val featureCollectionJson = Json.parse(featureCollectionJsonStr)
+      val collection: Option[FeatureCollectionInCRS[EPSG_4326, Geometry, JsValue]] =
+        FeatureJsonCodec.featureCollectionFromGeoJSON[JsValue].reads(featureCollectionJson).asOpt
 
-      val justPolys: FeatureCollectionInCRS[EPSG_4326, Polygonal, Json] =
+      val justPolys: FeatureCollectionInCRS[EPSG_4326, Polygonal, JsValue] =
         collection.get.collectGeometries[Polygonal]
-      justPolys.features should have size (2)
+      justPolys.features should have size (3)
       collection.get.features.head.setId should be(defined)
 
-      val justSinglePolys: FeatureCollectionInCRS[EPSG_4326, Polygon2D, Json] =
+      val justSinglePolys: FeatureCollectionInCRS[EPSG_4326, Polygon2D, JsValue] =
         collection.get.collectGeometries[Polygon2D]
-      justSinglePolys.features should be(empty)
+      justSinglePolys.features should have size (2)
 
-      val justMultiPolys: FeatureCollectionInCRS[EPSG_4326, MultiPolygon2D, Json] =
+      val justMultiPolys: FeatureCollectionInCRS[EPSG_4326, MultiPolygon2D, JsValue] =
         collection.get.collectGeometries[MultiPolygon2D]
-      justMultiPolys.features should have size (2)
+      justMultiPolys.features should have size (1)
 
-      val justPoints: FeatureCollectionInCRS[EPSG_4326, Point2D, Json] =
+      val justPoints: FeatureCollectionInCRS[EPSG_4326, Point2D, JsValue] =
         collection.get.collectGeometries[Point2D]
-      justPoints.features should be(empty)
+      justPoints.features should have size (4)
     }
 
     it("should encode and decode collections with mixed geometry types") {
@@ -144,26 +131,21 @@ class FeatureJsonCodecSpec extends AnyFunSpec with Matchers with TypeCheckedTrip
               poly2
             )))
 
-      val justPolysJsonStr = FeatureJsonCodec.featureCollectionToGeoJSON(justPolygonal).spaces2
-      val allGeomsJsonStr = FeatureJsonCodec.featureCollectionToGeoJSON(allGeoms).spaces2
+      import FeatureJsonCodec.given
+      val justPolysJson = Json.toJson(justPolygonal: FeatureCollection[Geometry, TestAttributes])
+      val allGeomsJson = Json.toJson(allGeoms)
 
-      val comparePolysStr =
-        FileReader.getLines("demodata/geometry/justpolys.geojson").mkString("\n")
-      val compareAllStr =
-        FileReader.getLines("demodata/geometry/allgeoms.geojson").mkString("\n")
+      val comparePolysStr = readFileToString("demodata/geometry/justpolys.geojson")
+      val compareAllStr = readFileToString("demodata/geometry/allgeoms.geojson")
 
-      justPolysJsonStr should be(comparePolysStr)
-      allGeomsJsonStr should be(compareAllStr)
+      justPolysJson should be(Json.parse(comparePolysStr))
+      allGeomsJson should be(Json.parse(compareAllStr))
 
-      val decodePolys: Try[FeatureCollectionInCRS[EPSG_4326, Geometry, Json]] =
-        FeatureJsonCodec.featureCollectionFromGeoJSON[Json](parse(justPolysJsonStr).right.get)
-
-      val decodeAll: Try[FeatureCollectionInCRS[EPSG_4326, Geometry, TestAttributes]] =
-        FeatureJsonCodec.featureCollectionFromGeoJSON[TestAttributes](
-          parse(allGeomsJsonStr).right.get)
+      val decodePolys = FeatureJsonCodec.featureCollectionFromGeoJSON[JsValue].reads(justPolysJson).asEither
+      val decodeAll = FeatureJsonCodec.featureCollectionFromGeoJSON[TestAttributes].reads(allGeomsJson).asEither
 
       val polysWithAttrs: FeatureCollection[Geometry, TestAttributes] =
-        decodePolys.get.mapAttributes(_.as[TestAttributes].right.get)
+        decodePolys.toOption.get.mapAttributes(_.as[TestAttributes])
 
       val polygonals = polysWithAttrs.collectGeometries[Polygonal]
 
@@ -172,32 +154,29 @@ class FeatureJsonCodecSpec extends AnyFunSpec with Matchers with TypeCheckedTrip
       polygonals.collectGeometries[Polygon2D].features should have size (2)
       polygonals.collectGeometries[MultiPolygon2D].features should have size (1)
 
-      val allWithAttrs = decodeAll.get
+      val allWithAttrs = decodeAll.toOption.get
 
       allWithAttrs.features should have size (11)
       allWithAttrs.collectGeometries[Puntal].features should have size (5)
     }
-
-    it("should decode and encode feature to/from GeoJSON") {}
-
   }
 
-  def attributeGeom[GEOM[_] <: Geometry[_], ATTR](geom: GEOM[EPSG_4326],
-                                                  attr: ATTR): Feature[GEOM, ATTR] =
-    Feature(geom, attr)
+  def attributeGeom[GEOM[_] <: Geometry[_], ATTR](
+    geom: GEOM[EPSG_4326],
+    attr: ATTR,
+    idx: Int,
+  ): Feature[GEOM, ATTR] =
+    Feature(geom, attr, Some(s"test_id$idx"))
 
   case class TestAttributes(i: Int, square: Double, stars: String)
-
-  import io.circe._, io.circe.generic.semiauto._
-
-  implicit val testAttrEncoder: Encoder[TestAttributes] = deriveEncoder[TestAttributes]
-  implicit val testAttrDecoder: Decoder[TestAttributes] = deriveDecoder[TestAttributes]
+  given Reads[TestAttributes] = Json.reads[TestAttributes]
+  given Writes[TestAttributes] = Json.writes[TestAttributes]
 
   def attributedGeoms[GEOM[_] <: Geometry[_], ATTR](
-      geoms: Seq[GEOM[EPSG_4326]]): Seq[Feature[GEOM, TestAttributes]] = {
-    for ((g, i) <- geoms.zipWithIndex) yield {
-      attributeGeom(g, TestAttributes(i, i * i, "*" * i))
+    geoms: Seq[GEOM[EPSG_4326]]
+  ): Seq[Feature[GEOM, TestAttributes]] =
+    for (g, i) <- geoms.zipWithIndex yield {
+      attributeGeom(g, TestAttributes(i, i * i, "*" * i), i)
     }
-  }*/
-  }
-
+    
+end FeatureJsonCodecSpec

@@ -62,7 +62,7 @@ class FeatureInCRSSpec extends AnyFunSpec with Matchers:
       val f1 = collection.features(0).withId(Some("ID1"))
       val f2 = collection.features(1).withId(Some("ID2"))
 
-      id1 should be("3d8f7f93-4355-33b4-a00d-368d320a1ffe")
+      id1 should be("test_id")
       id2 should be("72ff2bbc-ac24-3ad6-b672-55010eba09a2")
 
       f1.id should be("ID1")
@@ -105,5 +105,5 @@ object FeatureInCRSSpec:
     VAR: String
   )
 
-  implicit val testAttrEncoder: Format[FamilyFarms] = Json.format[FamilyFarms]
+  given Format[FamilyFarms] = Json.format[FamilyFarms]
 
