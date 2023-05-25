@@ -14,6 +14,14 @@ val imageIOExtVersion = "1.3.2"
 val scalaLoggingVersion = "3.9.4"
 val logbackVersion = "1.2.10"
 
+
+coverageExcludedFiles := "^.*src_managed.*$;^docs/.*$;^.*\\.md$;^.*\\.yml$"
+coverageExcludedPackages := "<empty>;.*\\.generators\\..*;.*\\.models\\..*"
+coverageMinimumStmtTotal := 55
+coverageFailOnMinimum := true
+coverageOutputCobertura := true
+coverageOutputXML := true
+
 resolvers ++= Seq(
   "JBoss" at "https://repository.jboss.org/maven2",
   "OSGeo" at "https://download.osgeo.org/webdav/geotools/",
@@ -30,6 +38,10 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
+  // this hardcoded path for jai_core is because the maven central jai is STILL missing the jar file
+  "javax.media" % "jai_core"     % "1.1.3" from "https://repository.jboss.org/maven2/javax/media/jai-core/1.1.3/jai-core-1.1.3.jar",
+  "javax.media" % "jai_codec"    % "1.1.3",
+  "javax.media" % "jai_imageio"  % "1.1",
   // Guava
   "com.google.guava" % "guava" % "31.1-jre",
   // Apache
@@ -55,10 +67,6 @@ libraryDependencies ++= Seq(
   //"org.jaitools" % "jt-vectorize" % jaiToolsVersion,
   // "javax.media" % "jai_imageio" % "1.1.1",
   // "javax.media" % "jai_core" % jaiCoreVersion,
-  // this hardcoded path for jai_core is because the maven central jai is STILL missing the jar file
-  "javax.media" % "jai_core"     % "1.1.3" from "https://repository.jboss.org/maven2/javax/media/jai-core/1.1.3/jai-core-1.1.3.jar",
-  "javax.media" % "jai_codec"    % "1.1.3",
-  "javax.media" % "jai_imageio"  % "1.1",
   "it.geosolutions.imageio-ext" % "imageio-ext-utilities" % "1.4.7",
   //"it.geosolutions.jaiext" % "jaiext" % jaiExtVersion pomOnly(),
   //"com.github.jai-imageio" % "jai-imageio-core" % jaiToolsVersion,

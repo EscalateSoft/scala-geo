@@ -1,5 +1,7 @@
 package com.escalatesoft.geo
+
 import com.escalatesoft.geo.crs.CRST
+
 import scala.util.Try
 //import com.cibo.continuum.spatial.domain.ContinuumFeatureCollection
 
@@ -67,25 +69,3 @@ object PracticalLimits:
     val areaThreshold = defaultAreaThreshold[CRS]
     fc.filter(_.geometry.area >= areaThreshold)
       .map(polyFeature => cleanPolygonalFeature(polyFeature))
-
-  /**
-    * Clean a continuum feature collection by converting it to
-    * geo 2 features, running the cleanFeatureCollection and converting
-    * back again. This is a stop gap until we can roll geo 2 out more
-    * widely.
-    *
-    * Since ContinuumFeatureCollections have an unmanaged Map[String,Any]
-    * to represent attributes, this can cause problems with conversion to/from
-    * geo 2 (which is typesafe) so we allow failure by returning a Try
-    * instead of just the new collection.
-    */
-  // def cleanContinuumFeatureCollection[CRS: CRST](
-  //     cfc: ContinuumFeatureCollection[CRS]
-  // ): Try[ContinuumFeatureCollection[CRS]] = {
-  //   import com.escalatesoft.geo.continuum.adapters.ContinuumAdapters._
-  //   for {
-  //     fc <- continuumFeatureCollectionToFeatureCollection(cfc)
-  //     cleaned = cleanFeatureCollection(fc.collectGeometries[Polygonal])
-  //     newCfc <- featureCollectionToContinuumFeatureCollection(cleaned)
-  //   } yield newCfc
-  // }

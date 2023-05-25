@@ -1,10 +1,13 @@
 package com.escalatesoft.geo
 
-import com.escalatesoft.geo.crs.CRST.CRSDefinitions.{EPSG_32615, EPSG_4326}
-
-import scala.util.Try
+import com.escalatesoft.geo.crs.CRST.CRSDefinitions.EPSG_32615
+import com.escalatesoft.geo.crs.CRST.CRSDefinitions.EPSG_4326
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 class FeatureSpec extends AnyFunSpec with Matchers:
 
@@ -197,6 +200,43 @@ class FeatureSpec extends AnyFunSpec with Matchers:
 
         // val nf: Feature[Polygon2D, (Yield, Flow, Duration)] =
         //   tf.calcAttr2(calcYield)
+      }
+
+      it("should narrow a geometry to a matching type") {
+        val rawPoints32615 = Seq(
+          RawCoordinate2D(561512.3702547651, 4724698.932194901),
+          RawCoordinate2D(561512.9892547653, 4724713.2251949),
+          RawCoordinate2D(561688.7152547662, 4724713.686194)
+        )
+
+        val polygon2D = Polygon2D[EPSG_32615](rawPoints32615)
+
+        val tf: Feature[Geometry, Banana] = Feature(polygon2D, Banana("Fife"))
+
+        val narrowedToPoly: Try[Feature[Polygon2D, Banana]] = tf.narrowGeometry[Polygon2D]
+
+        narrowedToPoly.isSuccess should be(true)
+        narrowedToPoly.get.geometry.areaInCRSUnits should be(polygon2D.transformCRS[EPSG_4326].areaInCRSUnits +- 1e-6)
+      }
+
+      it("should fail to narrow a geometry to an incompatible type") {
+        val rawPoints32615 = Seq(
+          RawCoordinate2D(561512.3702547651, 4724698.932194901),
+          RawCoordinate2D(561512.9892547653, 4724713.2251949),
+          RawCoordinate2D(561688.7152547662, 4724713.686194)
+        )
+
+        val polygon2D = Polygon2D[EPSG_32615](rawPoints32615)
+
+        val tf: Feature[Geometry, Banana] = Feature(polygon2D, Banana("Fife"))
+
+        val narrowedToPoly: Try[Feature[Point2D, Banana]] = tf.narrowGeometry[Point2D]
+
+        narrowedToPoly match
+          case Failure(exception) =>
+            exception.getMessage should be("Feature Polygon2D could not be narrowed to Point2D") 
+          case Success(value) =>
+            fail("should not have been able to narrow a polygon 2d to a point 2d")
       }
     }
   }

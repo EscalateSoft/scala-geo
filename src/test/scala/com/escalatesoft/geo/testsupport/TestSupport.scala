@@ -1,14 +1,12 @@
 package com.escalatesoft.geo.testsupport
 
 import com.escalatesoft.geo.Feature
-import com.escalatesoft.geo.shapefile.*
 import com.escalatesoft.geo.Geometry
-import com.escalatesoft.geo.shapefile.DoubleAttribute
 import com.escalatesoft.geo.shapefile.DateAttribute
+import com.escalatesoft.geo.shapefile.DoubleAttribute
+import com.escalatesoft.geo.shapefile.*
 
 object TestSupport:
-
-  case class ShapeAttributes(attributes: Map[String, ShapeAttribute])
 
   def compareFeatures(
     feature1: Feature[Geometry, ShapeAttributes],

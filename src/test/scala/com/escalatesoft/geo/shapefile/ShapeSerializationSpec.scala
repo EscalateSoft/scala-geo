@@ -1,20 +1,21 @@
 package com.escalatesoft.geo.shapefile
 
-import java.io.File
-import java.time.{LocalDate, ZonedDateTime}
-import java.util.UUID
-
 import com.escalatesoft.geo.*
+import com.escalatesoft.geo.testsupport.TestSupport
 import org.apache.commons.io.FileUtils
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-
-import scala.util.Try
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.JsValue
+import play.api.libs.json.Json
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import play.api.libs.json.Json
+
+import java.io.File
+import java.time.LocalDate
+import java.time.ZonedDateTime
+import java.util.UUID
+import scala.util.Try
 
 class ShapeSerializationSpec extends AnyFunSpec with Matchers with ScalaCheckPropertyChecks:
 
@@ -132,20 +133,24 @@ class ShapeSerializationSpec extends AnyFunSpec with Matchers with ScalaCheckPro
         case _ => fail("Expected a polygonal geometry")
     }
 
-    /*it("should result in the same feature after a round trip") {
+    it("should result in the same feature after a round trip") {
+      val knownShapeFile =
+        new File(
+          getClass.getClassLoader.getResource("demodata/geometry/YieldDuplicates/YieldDuplicates.shp").toURI)
+      val featureCollection = ShapeFileSerialization.readFeatures(knownShapeFile)
+
+      val feature: Feature[Geometry, ShapeAttributes] = featureCollection.features.head
 
       val tempDir = new File(new File("target/export"), UUID.randomUUID().toString)
       Try(tempDir.mkdirs())
       try
-        forAll(normalizedFeatureGeneratorIowa4326) { feature =>
-          val file = new File(tempDir, feature.id + ".shp")
-          ShapeFileSerialization.writeFeatureToFile(file, feature)
-          val readFeature = ShapeFileSerialization.readFeature(file)
+        val file = new File(tempDir, feature.id + ".shp")
+        ShapeFileSerialization.writeFeatureToFile(file, feature)
+        val readFeature = ShapeFileSerialization.readFeature(file)
 
-          TestSupport.compareFeatures(feature, readFeature)
-        }
+        TestSupport.compareFeatures(feature, readFeature)
       finally FileUtils.deleteDirectory(tempDir)
-    }*/
+    }
 
     it("should serialize rich attributes to/from ShapeAttributes") {
       val richAttr =

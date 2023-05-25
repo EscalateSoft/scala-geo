@@ -55,8 +55,10 @@ object LineString2D:
     * @tparam CRS the CRS type to construct the LineString2D in
     * @return a new LineString2D from the CRS and coords provided
     */
-  def apply[CRS: CRST](coords: Seq[RawCoordinate2D],
-                               withId: String): LineString2D[CRS] with GeometryWithID[CRS] =
+  def apply[CRS: CRST](
+    coords: Seq[RawCoordinate2D],
+    withId: String
+  ): LineString2D[CRS] with GeometryWithID[CRS] =
     apply(coords).assignId(withId)
 
   /**

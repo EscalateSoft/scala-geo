@@ -51,8 +51,10 @@ object MultiLineString2D:
     * @tparam CRS The CRS of the LineStrings, and the resulting MultiLineString
     * @return a new MultiLineString with all of the provided LineStrings in it
     */
-  def apply[CRS: CRST](lineStrings: Seq[LineString2D[CRS]],
-                               withId: String): MultiLineString2D[CRS] with GeometryWithID[CRS] =
+  def apply[CRS: CRST](
+    lineStrings: Seq[LineString2D[CRS]],
+    withId: String
+  ): MultiLineString2D[CRS] with GeometryWithID[CRS] =
     val factory = new jts.GeometryFactory
 
     val lineStringsArray: Array[LineString] = lineStrings.map(_.asJTS).toArray
