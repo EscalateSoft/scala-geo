@@ -900,20 +900,20 @@ object CRST extends LazyLogging:
       val SOME_CRS: CRST[SOME_CRS] = new CRST[SOME_CRS]:
         def apply(): CRSDef = crsDefn
 
-  def crsFromTiff(tiffFile: File): SomeCRS = {
+  def crsFromTiff(tiffFile: File): SomeCRS =
     val reader: GeoTiffReader = new GeoTiffReader(tiffFile)
-    try {
+    try
       val gc2d = reader.read(null)
       val coordRefSys: CoordinateReferenceSystem =
         gc2d.getCoordinateReferenceSystem2D
-      val matched = for {
+      val matched = for
         coordref <- coordRefSys.getIdentifiers.toArray.headOption
         matchedCRS <- CRST.optCrsFromId(coordref.toString)
-      } yield matchedCRS
+      yield matchedCRS
 
       matched.getOrElse(crsFromGeotools(coordRefSys))
-    } finally Try(reader.dispose())
-  }
+    finally Try(reader.dispose())
+
 
   def epsgUtmCodeForZoneNumber(zoneNumber: Int): String =
     f"EPSG:326$zoneNumber%02d"

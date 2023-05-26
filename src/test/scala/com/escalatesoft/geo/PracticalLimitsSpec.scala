@@ -1,40 +1,43 @@
-/*package com.escalatesoft.geo
+package com.escalatesoft.geo
 
-import org.scalatest._
-import com.cibo.continuum.storage.json.ContinuumFeatureJsonCodec
-import io.circe.parser._
-import org.apache.commons.io.FileUtils
-import java.io.File
-import io.circe.Json
 import com.escalatesoft.geo.crs.CRST.CRSDefinitions.EPSG_4326
+import com.escalatesoft.geo.json.FeatureCollectionJson
+import com.escalatesoft.geo.json.FeatureJsonCodec
+import com.escalatesoft.geo.json.GeoJsonRawFormats.given
+import org.apache.commons.io.FileUtils
+import org.scalatest.*
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
 
-class PracticalLimitsSpec extends FunSpec with Matchers {
+import java.io.File
+import java.nio.charset.StandardCharsets
+
+class PracticalLimitsSpec extends AnyFunSpec with Matchers:
   describe("Filtering for small polygons") {
     it("should clean up anything too small from either polygons or holes") {
       val testFile = new File(
         getClass.getClassLoader.getResource("demodata/geometry/reiher_stabilitymap.geojson").toURI
       )
-      val testFeatureJson = parse(FileUtils.readFileToString(testFile, "UTF8"))
-      val testFeatures = ContinuumFeatureJsonCodec.featureCollectionFromGeoJSON(testFeatureJson).get
 
-      import com.escalatesoft.geo.continuum.adapters.ContinuumAdapters._
-      import com.cibo.continuum.spatial.domain.DefaultAttributes._
+      val featureCollectionJsonStr = FileUtils.readFileToString(testFile, StandardCharsets.UTF_8)
+      val featureCollectionJson = Json.parse(featureCollectionJsonStr)
 
-      val geo2PolyFeatures =
-        continuumFeatureCollectionToFeatureCollection(testFeatures).get.collectGeometries[Polygonal]
+      val testFeatures: FeatureCollectionInCRS[EPSG_4326, Geometry, JsValue] =
+        FeatureJsonCodec.featureCollectionFromGeoJSON[JsValue].reads(featureCollectionJson).get
+
+      val geo2PolyFeatures = testFeatures.collectGeometries[Polygonal]
 
       val beforePolys = flattenAllPolys(geo2PolyFeatures)
 
-      val cleaned = PracticalLimits.cleanContinuumFeatureCollection(testFeatures).get
+      val cleaned = PracticalLimits.cleanFeatureCollection(geo2PolyFeatures)
 
       val beforeArea = geo2PolyFeatures.mapOut(_.geometry.areaInCRSUnits).sum
 
-      val geo2cleaned =
-        continuumFeatureCollectionToFeatureCollection(cleaned).get.collectGeometries[Polygonal]
+      val afterArea = cleaned.mapOut(_.geometry.areaInCRSUnits).sum
 
-      val afterArea = geo2cleaned.mapOut(_.geometry.areaInCRSUnits).sum
-
-      val afterPolys = flattenAllPolys(geo2cleaned)
+      val afterPolys = flattenAllPolys(cleaned)
 
       beforePolys.size should be(110)
       afterPolys.size should be(80)
@@ -46,9 +49,8 @@ class PracticalLimitsSpec extends FunSpec with Matchers {
 
       cleaned.features.zip(testFeatures.features) foreach {
         case (cleaned, original) =>
-          original.attributes.toMapAny() should be(cleaned.attributes.toMapAny())
+          original.attr should be(cleaned.attr)
           original.id should be(cleaned.id)
-          original.userData should be(cleaned.userData)
       }
     }
 
@@ -67,13 +69,10 @@ class PracticalLimitsSpec extends FunSpec with Matchers {
     }
   }
 
-  def flattenAllPolys(fc: FeatureCollection[Polygonal, Json]): Seq[Polygon2D[EPSG_4326]] = {
+  def flattenAllPolys(fc: FeatureCollection[Polygonal, JsValue]): Seq[Polygon2D[EPSG_4326]] = {
     fc.features.flatMap { feature =>
-      feature.geometry match {
+      feature.geometry match
         case p: Polygon2D[EPSG_4326]       => Seq(p)
         case mp: MultiPolygon2D[EPSG_4326] => mp.asPolygonSeq
-      }
     }
   }
-}
-*/
