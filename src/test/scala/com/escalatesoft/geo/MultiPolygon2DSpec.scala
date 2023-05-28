@@ -3,6 +3,7 @@ package com.escalatesoft.geo
 import com.escalatesoft.geo.crs.CRST.CRSDefinitions.{EPSG_32615, EPSG_4326}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import org.locationtech.jts.operation.valid.TopologyValidationError
 
 class MultiPolygon2DSpec extends AnyFunSpec with Matchers:
   describe("MultiPolygon2DTest") {
@@ -79,8 +80,12 @@ class MultiPolygon2DSpec extends AnyFunSpec with Matchers:
         ))
 
       validMP.isValid should be(true)
-      validMP.validated.isRight should be(true)
-      validMP.validated.toOption.get should be(validMP)
+
+      val validated = validMP.validated
+
+      validated match
+        case mp: MultiPolygon2D[_] => succeed
+        case err: TopologyValidationError => fail(err.toString)      
     }
 
     it("should not validate an invalid polygon") {
@@ -99,9 +104,13 @@ class MultiPolygon2DSpec extends AnyFunSpec with Matchers:
         ))
 
       invalidMP.isValid should be(false)
-      invalidMP.validated.isLeft should be(true)
-      invalidMP.validated.swap.toOption.get.toString should be(
-        "Self-intersection at or near point (1.0, 1.0, NaN)")
+
+      val validated = invalidMP.validated
+
+      validated match
+        case mp: MultiPolygon2D[_] => fail("Should not have validated an invalid multipolygon")
+        case err: TopologyValidationError =>
+          err.toString should be ("Self-intersection at or near point (1.0, 1.0, NaN)")
     }
 
   }

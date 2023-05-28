@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
 abstract class Polygonal[CRS: CRST] extends Geometry[CRS] with LazyLogging:
   import Polygonal.makePolygon
 
-  protected val jtsGeom: Either[jts.Polygon, jts.MultiPolygon]
+  protected val jtsGeom: jts.Polygon | jts.MultiPolygon
   def assignId(id: String): Polygonal[CRS] with GeometryWithID[CRS]
 
   /**
@@ -34,11 +34,10 @@ abstract class Polygonal[CRS: CRST] extends Geometry[CRS] with LazyLogging:
     */
   @inline override def defaultTolerance: Double = ccrs.areaTolerance
 
-  @inline override protected[geo] def asJTS: jts.Geometry with jts.Polygonal = genericGeom
-  private[this] lazy val genericGeom: jts.Geometry with jts.Polygonal =
+  @inline override protected[geo] def asJTS: jts.Geometry & jts.Polygonal = genericGeom
+  private[this] lazy val genericGeom: jts.Geometry & jts.Polygonal =
     jtsGeom match
-      case Left(p)  => p
-      case Right(mp) => mp
+      case p: jts.Polygonal => p
 
   /**
     * Return the centroid of the current polygon, as specified by JTS.

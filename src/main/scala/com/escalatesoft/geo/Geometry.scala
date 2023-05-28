@@ -168,7 +168,7 @@ object Geometry:
     fromJTS[CRS](jtsGeom)
 
   /**
-    * Create a geometry with the given CRS from the provided WKT string. See fromWKT.
+    * Create a geometry with the given CRS from the provided well known bytes. See fromWKT.
     */
   def fromWKB[CRS: CRST](wkb: Array[Byte]): Geometry[CRS] =
     val reader = new WKBReader()

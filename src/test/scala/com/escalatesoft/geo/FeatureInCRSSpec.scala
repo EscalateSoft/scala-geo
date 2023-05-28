@@ -91,6 +91,35 @@ class FeatureInCRSSpec extends AnyFunSpec with Matchers:
         alteredAttributes.features(i).## should be(collection.features(i).##)
     }
 
+    it("should allow you to take some features from a collection") {
+      val firstTwo: FeatureCollection[Geometry, JsValue] = collection.take(1)
+      collection.length should be(2)
+      firstTwo.features.length should be(1)
+      firstTwo.features(0) should be(collection.features(0))
+
+      // attempt to get the next item should fail
+      intercept[IndexOutOfBoundsException] {
+        firstTwo.features(1)
+      }
+    }
+
+    it("should not create a new instance of the collection when normalized if the CRS is already 4326") {
+      val transformedUTM: FeatureCollectionInCRS[EPSG_32615, Geometry, JsValue] =
+        collection.transformCRS[EPSG_32615]
+
+      val normalized1 = transformedUTM.normalize
+      val normalized2 = normalized1.normalize
+
+      normalized1 should be theSameInstanceAs (normalized2)
+      normalized1 should not be theSameInstanceAs (transformedUTM)
+    }
+
+    it("should allow you to update the id") {
+      collection.featureTypeId should be(None)
+      val updated = collection.withFeatureTypeId(Some("new_id"))
+      updated.featureTypeId should be(Some("new_id"))
+      updated.features should be theSameInstanceAs (collection.features)
+    }
   }
 
 

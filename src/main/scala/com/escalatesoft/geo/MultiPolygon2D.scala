@@ -14,7 +14,7 @@ class MultiPolygon2D[CRS: CRST] private (jtsMP: jts.MultiPolygon)
     extends Polygonal[CRS]
     with Validator[MultiPolygon2D[CRS]]
     with GeometryCollection[CRS, Polygon2D[CRS], jts.Polygon]:
-  override protected val jtsGeom: Either[jts.Polygon, jts.MultiPolygon] = Right(jtsMP)
+  override protected val jtsGeom: jts.Polygon | jts.MultiPolygon = jtsMP
 
   override protected[geo] def asJTS: jts.MultiPolygon = jtsMP
   def assignId(id: String): MultiPolygon2D[CRS] with GeometryWithID[CRS] =
@@ -25,14 +25,13 @@ class MultiPolygon2D[CRS: CRST] private (jtsMP: jts.MultiPolygon)
     Option(new IsValidOp(jtsMP).getValidationError)
 
   /**
-    * Validate this geometry. Either return this item (right) or
-    * the validity violation (left)
+    * Validate this geometry. Either return this item or
+    * the validity violation in a union type
     *
-    * @return an Either with this on the right projection or the invalidity
-    *         reason on the left projection.
+    * @return a union type with this multipolygon or the invalidity reason.
     */
-  override def validated: Either[TopologyValidationError, MultiPolygon2D[CRS]] =
-    getValidationError.map(Left.apply).getOrElse(Right(this))
+  override def validated: TopologyValidationError | MultiPolygon2D[CRS] =
+    getValidationError.getOrElse(this)
 
   override def transformCRS[NEW_CRS: CRST]: MultiPolygon2D[NEW_CRS] =
     if CRSTransform.sameCRS[CRS, NEW_CRS] then this.asInstanceOf[MultiPolygon2D[NEW_CRS]]

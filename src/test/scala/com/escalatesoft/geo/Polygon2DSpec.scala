@@ -1,16 +1,15 @@
 package com.escalatesoft.geo
 
-import java.io.File
-import java.nio.charset.Charset
-
-import com.escalatesoft.geo.crs.CRST.CRSDefinitions.{
-  EPSG_32615,
-  EPSG_32616,
-  EPSG_4326
-}
+import com.escalatesoft.geo.crs.CRST.CRSDefinitions.EPSG_32615
+import com.escalatesoft.geo.crs.CRST.CRSDefinitions.EPSG_32616
+import com.escalatesoft.geo.crs.CRST.CRSDefinitions.EPSG_4326
 import org.apache.commons.io.FileUtils
+import org.locationtech.jts.operation.valid.TopologyValidationError
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+
+import java.io.File
+import java.nio.charset.Charset
 
 class Polygon2DSpec extends AnyFunSpec with Matchers:
   describe("PolygonSpec") {
@@ -109,8 +108,10 @@ class Polygon2DSpec extends AnyFunSpec with Matchers:
     it("should validate a valid polygon") {
       val validPolygonWithHoles = Polygon2D[EPSG_32615](outerRing, Seq(inner1, inner2, inner3))
       validPolygonWithHoles.isValid should be(true)
-      validPolygonWithHoles.validated.isRight should be(true)
-      validPolygonWithHoles.validated.toOption.get should be(validPolygonWithHoles)
+
+      validPolygonWithHoles.validated match
+        case poly: Polygon2D[_] => poly should be(validPolygonWithHoles)
+        case _ => fail("should have been an identical polygon")
     }
 
     it("should not validate an invalid polygon") {
@@ -123,9 +124,11 @@ class Polygon2DSpec extends AnyFunSpec with Matchers:
 
       val invalidPoly = Polygon2D[EPSG_32615](outerRing, Seq(inner1, inner2, inner3, inner4))
       invalidPoly.isValid should be(false)
-      invalidPoly.validated.isLeft should be(true)
-      invalidPoly.validated.swap.toOption.get.toString should be(
-        "Self-intersection at or near point (1.0, 1.0, NaN)")
+
+      invalidPoly.validated match
+        case poly: Polygon2D[_] => fail("should not have been a valid polygon")
+        case err: TopologyValidationError =>
+          err.toString should be ("Self-intersection at or near point (1.0, 1.0, NaN)")
     }
 
     it("should produce correct WKT and eWKT when requested") {

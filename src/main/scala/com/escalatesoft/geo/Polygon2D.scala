@@ -24,7 +24,7 @@ class Polygon2D[CRS: CRST] private (jtsPolygon: JTSPolygon)
     with Validator[Polygon2D[CRS]]
     with LazyLogging:
 
-  override protected val jtsGeom: Either[jts.Polygon, jts.MultiPolygon] = Left(jtsPolygon)
+  override protected val jtsGeom: jts.Polygon | jts.MultiPolygon = jtsPolygon
 
   def assignId(id: String): Polygon2D[CRS] with GeometryWithID[CRS] =
     new Polygon2D[CRS](jtsPolygon) with GeometryWithID[CRS]:
@@ -99,14 +99,12 @@ class Polygon2D[CRS: CRST] private (jtsPolygon: JTSPolygon)
     Option(new IsValidOp(jtsPolygon).getValidationError)
 
   /**
-    * Validate this geometry. Either return this item (right) or
-    * the validity violation (left)
+    * Validate this geometry. Either return this item the validity violation in a union type
     *
-    * @return an Either with this on the right projection or the invalidity
-    *         reason on the left projection.
+    * @return a union type with this polygon or the invalidity reason
     */
-  override def validated: Either[TopologyValidationError, Polygon2D[CRS]] =
-    getValidationError.map(Left.apply).getOrElse(Right(this))
+  override def validated: TopologyValidationError | Polygon2D[CRS] =
+    getValidationError.getOrElse(this)
 
 
 object Polygon2D:
