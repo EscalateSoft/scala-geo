@@ -23,13 +23,3 @@ def prependValueToTuple[T <: Tuple, A](a: A, t: T): A *: T = a *: t
 
 def prependResult[T1 <: Tuple, T2 <: Tuple, A](f: T2 => A, t: T1)(using s: Subset[T1, T2]): A *: T1 =
   f(subset(t)) *: t
-
-def fn1ToTuple[A, B](f: A => B): Tuple1[A] => B = a => f(a._1)
-def fn2ToTuple[A, B, C](f: (A, B) => C): ((A, B)) => C = f.tupled
-def fn3ToTuple[A, B, C, D](f: (A, B, C) => D): ((A, B, C)) => D = f.tupled
-def fn4ToTuple[A, B, C, D, E](f: (A, B, C, D) => E): ((A, B, C, D)) => E = f.tupled
-def fn5ToTuple[A, B, C, D, E, F](f: (A, B, C, D, E) => F): ((A, B, C, D, E)) => F = f.tupled
-def fn6ToTuple[A, B, C, D, E, F, G](f: (A, B, C, D, E, F) => G): ((A, B, C, D, E, F)) => G = f.tupled
-def fn7ToTuple[A, B, C, D, E, F, G, H](f: (A, B, C, D, E, F, G) => H): ((A, B, C, D, E, F, G)) => H = f.tupled
-def fn8ToTuple[A, B, C, D, E, F, G, H, I](f: (A, B, C, D, E, F, G, H) => I): ((A, B, C, D, E, F, G, H)) => I = f.tupled
-def fn9ToTuple[A, B, C, D, E, F, G, H, I, J](f: (A, B, C, D, E, F, G, H, I) => J): ((A, B, C, D, E, F, G, H, I)) => J = f.tupled

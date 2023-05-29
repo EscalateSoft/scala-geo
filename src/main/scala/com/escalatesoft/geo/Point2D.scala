@@ -25,7 +25,6 @@ case class Point2D[CRS: CRST] private (x: Double, y: Double)
 
   val crs: CRST[CRS] = summon[CRST[CRS]]
 
-  def withId: Option[String] = None
   override def assignId(id: String): Point2D[CRS] & GeometryWithID[CRS] =
     new Point2D[CRS](x, y) with GeometryWithID[CRS]:
       override val geometryId: String = id

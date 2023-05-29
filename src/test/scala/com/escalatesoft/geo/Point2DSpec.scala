@@ -228,4 +228,9 @@ class Point2DSpec extends AnyFunSpec with Matchers:
       val crs: CRST.SomeCRS = coords.bestUtmCRS
       crs shouldBe CRST.crsFromId("EPSG:32720")
     }
+    it("should update the type when you include an id") {
+      val coords: Point2D[EPSG_4326] = Point2D[EPSG_4326](-63, -10)
+      val withId: GeometryWithID[EPSG_4326] & Point2D[EPSG_4326] = coords.assignId("test_id")
+      withId.geometryId shouldBe "test_id"
+    }
   }

@@ -915,12 +915,16 @@ object CRST extends LazyLogging:
     finally Try(reader.dispose())
 
 
-  def epsgUtmCodeForZoneNumber(zoneNumber: Int): String =
-    f"EPSG:326$zoneNumber%02d"
+  def epsgUtmCodeForZoneNumber(zoneNumber: Int, northernHemisphere: Boolean): Option[String] =
+    if zoneNumber < 1 || zoneNumber > 60 then None
+    else
+      if northernHemisphere then Some(s"EPSG:326$zoneNumber")
+      else Some(s"EPSG:327$zoneNumber")
 
   val nhPattern: Regex = """(\d{2})N""".r
   val shPattern: Regex = """(\d{2})S""".r
   val numPattern: Regex = """(\d{2})""".r
+
   def epsgUtmCodeForZoneNumber(zoneNumber: String): String = zoneNumber match
     case nhPattern(zn)  => s"EPSG:326$zn"
     case shPattern(zn)  => s"EPSG:327$zn"
