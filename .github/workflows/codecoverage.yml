@@ -3,7 +3,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Scala CI
+name: Scala Code Coverage
 
 on:
   push:
@@ -28,4 +28,6 @@ jobs:
         distribution: 'temurin'
         cache: 'sbt'
     - name: Run tests with coverage
-      run: sbt test
+      run: sbt clean coverage test
+    - name: Coverage Report
+      run: sbt coverageReport
